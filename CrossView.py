@@ -35,7 +35,7 @@ def create_folds(args, data):
     train_data = data.iloc[train]
     
     test_data = data.iloc[test]
-    train_split = int(round(train_data.shape[0] *0.6))
+    train_split = int(round(train_data.shape[0] *0.8))
     t_data = train_data.iloc[:train_split]
     v_data = train_data.iloc[train_split:]
     return t_data, v_data, test_data

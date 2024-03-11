@@ -47,7 +47,7 @@ To fix, add into you .bashrc file add the following: alias nano='LD_LIBRARY_PATH
 3) in bash file "demo.sh" for cluster or "Run_CME_MODEL.sh" for local deplotment.
 
 4) changes to make in .sh file:
-
+~~~
 	for ret in 0 1 2; do  #### number of repeat runs
 	
 		for fod in 0 1 2 3 4; do #### testing fold
@@ -63,3 +63,4 @@ To fix, add into you .bashrc file add the following: alias nano='LD_LIBRARY_PATH
 			done
 		done	
 	done
+~~~

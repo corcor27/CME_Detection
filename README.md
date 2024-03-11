@@ -64,3 +64,5 @@ To fix, add into you .bashrc file add the following: alias nano='LD_LIBRARY_PATH
 		done	
 	done
 ~~~
+
+5) to run locally run "bash Run_CME_MODEL.sh" and cluster "bash demo.sh"

@@ -58,7 +58,7 @@ To fix, add into you .bashrc file add the following: alias nano='LD_LIBRARY_PATH
 					--backbone $model\
 		        		--repeat $ret\
 					--test_fold $fod \
-	                                --mode train
+	                                --mode train  #### function you want the system to use; train: training, inference: testing, inference_out: testing with results file showing accuracy, features: PCA/UMAP clusters, attention_maps: Grad-cam attention maps
 	
 			done
 		done	

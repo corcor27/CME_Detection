@@ -40,7 +40,7 @@ To fix, add into you .bashrc file add the following: alias nano='LD_LIBRARY_PATH
 
 # To run CME code
 
-1) collections images from:
+1) collections images from: https://drive.google.com/file/d/1QrVGfTuXrQpJcojR8M9XqZXnamN3Z1Gd/view?usp=sharing
 
 2) Make sure the image folder is in the same level as the "CrossView.py" file
 

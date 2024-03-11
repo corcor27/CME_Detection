@@ -35,7 +35,7 @@ def create_folds(args, data):
     train_data = data.iloc[train]
     
     test_data = data.iloc[test]
-    train_split = int(round(train_data.shape[0] *0.8))
+    train_split = int(round(train_data.shape[0] *0.6))
     t_data = train_data.iloc[:train_split]
     v_data = train_data.iloc[train_split:]
     return t_data, v_data, test_data
@@ -185,53 +185,6 @@ if args.mode == "train":
     p = "{}_{}_{}_{}_{}_{}_{}_{}.h5".format(args.connection_type, args.val_fold,args.test_fold, args.repeat, args.img_size, args.max_epochs, args.backbone, args.tag)
     args.wieghts_output_dir = os.path.join("WIEGHTS", p)
     
-    train_data, val_data, test_data = create_folds2(args, data)
-    print(train_data.shape)
-    print(train_data.shape, val_data.shape, test_data.shape)
-    
-    print('data.shape in loader = ', data.shape)
-    
-    #AUTOTUNE = tf.data.AUTOTUNE
-    
-    train_generator = CustomDataGen(train_data, args, mode = "training")
-    print(train_generator.df.shape)
-    train_generator.pre_check_images()
-    print(train_generator.df.shape)
-    print('Total data len = ', train_generator.n)
-    print('Class Count = ', train_generator.Class_Count())
-    if args.use_output_bias:
-        classes = list(train_generator.Class_Count())
-        args.output_bias = tf.keras.initializers.Constant(np.log([classes[0]/classes[1]]))
-    valid_generator = CustomDataGen(val_data, args, mode = "validation")
-    valid_generator.pre_check_images()
-    print('Total val len = ', valid_generator.n)
-    print('Class Count = ', valid_generator.Class_Count())
-    if args.features:
-        test_generator = CustomDataGen(data, args, mode = "validation", batch=1)
-        test_generator.pre_check_images()
-        my_model = CustomModel(args)
-        my_model.Prep_training(train_generator, valid_generator, test_generator = test_generator)
-    else:
-        if args.multi_process:
-            my_model = CustomModel_Multi(args)
-            my_model.Prep_training(train_generator, valid_generator)
-        else:
-            my_model = CustomModel(args)
-            #my_model = CustomModel_Multi(args)
-            my_model.Prep_training(train_generator, valid_generator)
-    if args.training_type == "Regression":
-        my_model.Train_model_regression()
-    else:
-        my_model.Train_model()
-        
-
-
-if args.mode == "train_finetune":
-    p = "{}_{}_{}_{}_{}_{}_{}_{}.h5".format(args.connection_type, args.val_fold,args.test_fold, args.repeat, args.img_size, args.max_epochs, args.backbone, args.tag)
-    args.wieghts_output_dir = os.path.join("WIEGHTS2", p)
-    p2 = "{}_{}_{}_{}_{}_{}_{}_{}.h5".format(args.connection_type, args.val_fold,args.test_fold, args.repeat, args.img_size, 50, args.backbone, args.tag)
-    args.weight_path = os.path.join("WIEGHTS", p2)
-    args.load_weight = True
     train_data, val_data, test_data = create_folds(args, data)
     print(train_data.shape)
     print(train_data.shape, val_data.shape, test_data.shape)
@@ -249,7 +202,7 @@ if args.mode == "train_finetune":
     if args.use_output_bias:
         classes = list(train_generator.Class_Count())
         args.output_bias = tf.keras.initializers.Constant(np.log([classes[0]/classes[1]]))
-    valid_generator = CustomDataGen(test_data, args, mode = "validation")
+    valid_generator = CustomDataGen(val_data, args, mode = "validation")
     valid_generator.pre_check_images()
     print('Total val len = ', valid_generator.n)
     print('Class Count = ', valid_generator.Class_Count())
@@ -270,43 +223,7 @@ if args.mode == "train_finetune":
         my_model.Train_model_regression()
     else:
         my_model.Train_model()
-
-
-if args.mode == "inference2":
-    p = "{}_{}_{}_{}_{}_{}_{}_{}.h5".format(args.connection_type, args.val_fold,args.test_fold, args.repeat, args.img_size, args.max_epochs, args.backbone, args.tag)
-    args.wieghts_output_dir = os.path.join("WIEGHTS", p)
-    
-    train_data, val_data, test_data = create_folds2(args, data)
-    print(train_data.shape)
-    print(train_data.shape, val_data.shape, test_data.shape)
-    
-    print('data.shape in loader = ', data.shape)
-    
-    #AUTOTUNE = tf.data.AUTOTUNE
-    
-    train_generator = CustomDataGen(train_data, args, mode = "training")
-    print(train_generator.df.shape)
-    train_generator.pre_check_images()
-    print(train_generator.df.shape)
-    print('Total data len = ', train_generator.n)
-    print('Class Count = ', train_generator.Class_Count())
-    if args.use_output_bias:
-        classes = list(train_generator.Class_Count())
-        args.output_bias = tf.keras.initializers.Constant(np.log([classes[0]/classes[1]]))
-    valid_generator = CustomDataGen(val_data, args, mode = "validation")
-    valid_generator.pre_check_images()
-    print('Total val len = ', valid_generator.n)
-    print('Class Count = ', valid_generator.Class_Count())
-    args.load_weight = True
-    args.weight_path = os.path.join("WIEGHTS", p)
-    if args.multi_process:
-        my_model = CustomModel_Multi(args)
-        my_model.Prep_training(train_generator, valid_generator)
-        Acc = my_model.predict_model()
-        print(Acc)
         
-
-
     
 elif args.mode == "inference":
     
@@ -316,7 +233,7 @@ elif args.mode == "inference":
     print('data.shape in loader = ', data.shape)
     
     AUTOTUNE = tf.data.AUTOTUNE
-    train_data, val_data, test_data = create_folds2(args, data)
+    train_data, val_data, test_data = create_folds(args, data)
     print(train_data.shape, val_data.shape, test_data.shape)
     
     
@@ -371,7 +288,7 @@ elif args.mode == "inference_out":
     print('data.shape in loader = ', data.shape)
     
     AUTOTUNE = tf.data.AUTOTUNE
-    train_data, val_data, test_data = create_folds2(args, data)
+    train_data, val_data, test_data = create_folds(args, data)
     print(train_data.shape, val_data.shape, test_data.shape)
     
     
@@ -407,119 +324,6 @@ elif args.mode == "inference_out":
         data = pd.DataFrame.from_dict(d)
         df = pd.concat([df, data], axis=0)
         df.to_excel(excel_p)
-        
-        
-    
-   
-        
-elif args.mode == "prediction_comparision":
-    
-    p = "{}_{}_{}_{}_{}_{}_{}_{}.h5".format(args.connection_type, args.val_fold,args.test_fold, args.repeat, args.img_size, args.max_epochs, args.backbone, args.tag)
-    args.weight_path = os.path.join("WIEGHTS", p)
-    print(args.weight_path)
-    print('data.shape in loader = ', data.shape)
-    
-    AUTOTUNE = tf.data.AUTOTUNE
-    train_data, val_data, test_data = create_folds(args, data)
-    print(train_data.shape, val_data.shape, test_data.shape)
-    
-    
-    AUTOTUNE = tf.data.AUTOTUNE
-    
-    train_generator = CustomDataGen(train_data, args, mode = "training")
-    train_generator.pre_check_images()
-    
-    print('Total data len = ', train_generator.n)
-    
-    print('Class Count = ', train_generator.Class_Count())
-    valid_generator = CustomDataGen(test_data, args, mode = "validation")
-    valid_generator.pre_check_images()
-    print('Total val len = ', valid_generator.n)
-    print('Class Count = ', valid_generator.Class_Count())
-    args.batch_size = 1
-    args.weight_path = os.path.join("WIEGHTS", p)
-    my_model = CustomModel(args)
-    my_model.Prep_training(train_generator, valid_generator)
-    print('Class weights = ', my_model.Class_weights)
-    if args.model_type == 'Classification':
-        Acc = my_model.prediction_fixtures()
-    
-elif args.mode == "fold_testing":
-    Ground = []
-    prediction = []
-    Names = []
-    scale = int(round(data.shape[0]/5))
-    for fod in range(0, args.Num_folds):
-        train_data, val_data, test_data = create_folds(args.Num_folds, fod, data)
-        args.batch_size = 1
-        p = "{}_{}_{}_{}_{}_{}_{}.h5".format(args.connection_type, fod, args.repeat, args.img_size, args.max_epochs, args.backbone, args.tag)
-        args.weight_path = os.path.join("WIEGHTS", p)
-        args.load_weight = True
-        valid_generator = CustomDataGen(test_data, args, mode = "validation")
-        valid_generator.pre_check_images()
-        print('Total val len = ', valid_generator.n)
-        my_model = CustomModel(args)
-        my_model.Prep_training(valid_generator, valid_generator)
-        print('Class weights = ', my_model.Class_weights)
-        Val_GRON, Val_PRED, Nam = my_model.predict_model_fold()
-        Names.append(Nam)
-        Ground.append(Val_GRON), prediction.append(Val_PRED)
-    Ground = np.concatenate(Ground)
-    prediction = np.concatenate(prediction)
-    Names = np.concatenate(Names)
-    prediction = prediction.astype(np.uint8)
-    Score = []
-    
-    for row in range(0, data.shape[0]):
-        nam = str(data[args.image_col].iloc[row])
-        try:
-            pos = list(Names).index(nam)
-            if (Ground[pos,:] == prediction[pos,:]).all():
-                Score.append(1)
-            else:
-                Score.append(0)
-        except:
-            Score.append(5)
-        
-        
-    data["Score"] = Score
-    #data = data[data.Score != 5]
-    #data.to_excel("Size_information.xlsx")
-        
-    #ACC = my_model.predict_model_analysis(Ground, prediction)
-    
-    
-elif args.mode == "folds_to_excel":
-    Names = []
-    Acc_list = []
-    DC = []
-    IN = []
-    scale = int(round(data.shape[0]/5))
-    for fod in range(0, args.Num_folds):
-        test_data = data.iloc[scale*fod:scale*(fod+1)]
-        args.batch_size = 1
-        p = "{}_{}_{}_{}_{}_{}_{}.h5".format(args.connection_type, args.fold, args.repeat, args.img_size, args.max_epochs, args.backbone, args.tag)
-        args.weight_path = os.path.join("WIEGHTS", p)
-        valid_generator = CustomDataGen(test_data, args, mode = "validation")
-        valid_generator.pre_check_images()
-        print('Total val len = ', valid_generator.n)
-        my_model = CustomModel(args)
-        my_model.Prep_training(valid_generator, valid_generator)
-        print('Class weights = ', my_model.Class_weights)
-        NAMES, ACC_LIST, INV, DCIS = my_model.predict_model_excel()
-        Names.append(NAMES), Acc_list.append(ACC_LIST)
-        DC.append(DCIS)
-        IN.append(INV)
-    Names = list(itertools.chain(*Names))
-    Acc_list = list(itertools.chain(*Acc_list))
-    DC = list(itertools.chain(*DC))
-    IN = list(itertools.chain(*IN))
-    frame = pd.DataFrame()
-    frame["Names"] = Names
-    frame["prediction"] = Acc_list
-    frame["DCIS"] = DC
-    frame["IN"] = IN
-    frame.to_excel("{}_{}.xlsx".format(args.connection_type, args.img_size))
     
 elif args.mode == "features":
     
@@ -549,187 +353,6 @@ elif args.mode == "features":
     my_model.Prep_training(train_generator, valid_generator)
     print('Class weights = ', my_model.Class_weights)
     Extract = my_model.Extract_features()
-    
-elif args.mode == "threshold_model":
-    
-    p = "{}_{}_{}_{}_{}_{}_{}.h5".format(args.connection_type, args.fold, args.repeat, args.img_size, args.max_epochs, args.backbone, args.tag)
-    args.weight_path = os.path.join("WIEGHTS", p)
-    print(args.weight_path)
-    print('data.shape in loader = ', data.shape)
-    train_data, val_data, test_data = create_folds(args.Num_folds, args.fold, data)
-    print(train_data.shape, val_data.shape, test_data.shape)
-    AUTOTUNE = tf.data.AUTOTUNE
-    training_data = pd.concat([train_data, val_data], axis=0)
-    
-    train_generator = CustomDataGen(training_data, args, mode = "training")
-    train_generator.pre_check_images()
-    
-    print('Total data len = ', train_generator.n)
-    
-    print('Class Count = ', train_generator.Class_Count())
-    valid_generator = CustomDataGen(test_data, args, mode = "validation")
-    valid_generator.pre_check_images()
-    print('Total val len = ', valid_generator.n)
-    print('Class Count = ', valid_generator.Class_Count())
-    args.batch_size = 1
-    args.weight_path = os.path.join("WIEGHTS", p)
-    my_model = CustomModel(args)
-    my_model.Prep_training(train_generator, valid_generator)
-    print('Class weights = ', my_model.Class_weights)
-    Extract, tag = my_model.Extract_features_model()
-    thresh_extract = Extract[(Extract[tag] <= args.threashold)]
-    additional_training_data = Extract[(Extract[tag] > args.threashold) & (Extract["belong_set"] == 1)]
-    print(thresh_extract.shape)
-    train_data2 = thresh_extract[(thresh_extract["belong_set"] == 1)]
-    test_data2 = thresh_extract[(thresh_extract["belong_set"] == 0)]
-    print(train_data2.shape, test_data2.shape)
-    #gap = 1000 - train_data2.shape[0]
-    additional_training_data = additional_training_data.iloc[:,:train_data2.shape[0]]
-    train_data2 = pd.concat([train_data2, additional_training_data], axis=0)
-    train_data2 = shuffle(train_data2)
-    print(train_data2.shape, test_data2.shape)
-    split = int(round(len(train_data2)*0.8,0))
-    train, val = train_data2[:split], train_data2[split:]
-    testing_data = Extract[(Extract["belong_set"] == 0)]
-    #print(testing_data.shape)
-    
-    #Val_PRED = np.array(testing_data.loc[:, [args.prediction_classes[0]+ "_pred", args.prediction_classes[1]+ "_pred"]])
-    #Val_GRON = np.array(testing_data.loc[:, [args.prediction_classes[0], args.prediction_classes[1]]])
-    #ACC = accuracy_score(Val_GRON, Val_PRED)
-    #print(ACC)
-    args.batch_size = 16
-    args.repeat = "{}_{}".format(args.repeat,args.repeat)
-    d = "{}_{}_{}_{}_{}_{}_{}.h5".format(args.connection_type, args.fold, args.repeat, args.img_size, args.max_epochs, args.backbone, args.tag)
-    args.wieghts_output_dir = os.path.join("WIEGHTS", d)
-    args.weight_path = "None"
-    train_generator = CustomDataGen(train, args, mode = "training")
-    train_generator.pre_check_images()
-    print('Total data len = ', train_generator.n)
-    
-    print('Class Count = ', train_generator.Class_Count())
-    valid_generator = CustomDataGen(val, args, mode = "validation")
-    valid_generator.pre_check_images()
-    print('Total val len = ', valid_generator.n)
-    print('Class Count = ', valid_generator.Class_Count())
-    my_model = CustomModel(args)
-    my_model.Prep_training(train_generator, valid_generator)
-    my_model.Train_model()
-    train.to_excel("Train.xlsx")
-    val.to_excel("Val.xlsx")
-    testing_data.to_excel("Test.xlsx")
-    test_data2.to_excel("Test2.xlsx")
-
-elif args.mode == "threshold_testing":
-    
-    p = "{}_{}_{}_{}_{}_{}_{}.h5".format(args.connection_type, args.fold, args.repeat, args.img_size, args.max_epochs, args.backbone, args.tag)
-    args.weight_path = os.path.join("WIEGHTS", p)
-    print(args.weight_path)
-    print('data.shape in loader = ', data.shape)
-    train_data, val_data, test_data = create_folds(args.Num_folds, args.fold, data)
-    print(train_data.shape, val_data.shape, test_data.shape)
-    AUTOTUNE = tf.data.AUTOTUNE
-    training_data = pd.concat([train_data, val_data], axis=0)
-    
-    train_generator = CustomDataGen(training_data, args, mode = "training")
-    train_generator.pre_check_images()
-    
-    print('Total data len = ', train_generator.n)
-    
-    print('Class Count = ', train_generator.Class_Count())
-    valid_generator = CustomDataGen(test_data, args, mode = "validation")
-    valid_generator.pre_check_images()
-    print('Total val len = ', valid_generator.n)
-    print('Class Count = ', valid_generator.Class_Count())
-    args.batch_size = 1
-    args.weight_path = os.path.join("WIEGHTS", p)
-    my_model = CustomModel(args)
-    my_model.Prep_training(train_generator, valid_generator)
-    print('Class weights = ', my_model.Class_weights)
-    Test = my_model.Extract_features_threasholding()
-
-elif args.mode == "thresh_inference":
-    args.repeat = "{}_{}".format(args.repeat,args.repeat)
-    p = "{}_{}_{}_{}_{}_{}_{}.h5".format(args.connection_type, args.fold, args.repeat, args.img_size, args.max_epochs, args.backbone, args.tag)
-    args.weight_path = os.path.join("WIEGHTS", p)
-    print(args.weight_path)
-    print('data.shape in loader = ', data.shape)
-    
-    AUTOTUNE = tf.data.AUTOTUNE
-    train_data, val_data, test_data = pd.read_excel("Train.xlsx"), pd.read_excel("Val.xlsx"), pd.read_excel("Test.xlsx")
-    print(train_data.shape, val_data.shape, test_data.shape)
-    
-    
-    AUTOTUNE = tf.data.AUTOTUNE
-    
-    train_generator = CustomDataGen(train_data, args, mode = "training")
-    train_generator.pre_check_images()
-    
-    print('Total data len = ', train_generator.n)
-    
-    print('Class Count = ', train_generator.Class_Count())
-    valid_generator = CustomDataGen(test_data, args, mode = "validation")
-    valid_generator.pre_check_images()
-    print('Total val len = ', valid_generator.n)
-    print('Class Count = ', valid_generator.Class_Count())
-    args.batch_size = 1
-    args.weight_path = os.path.join("WIEGHTS", p)
-    my_model = CustomModel(args)
-    my_model.Prep_training(train_generator, valid_generator)
-    print('Class weights = ', my_model.Class_weights)
-    if args.model_type == 'Classification':
-        if args.num_input_objects == 6:
-            Acc = my_model.predict_model2()
-        else:
-            Acc = my_model.predict_model()
-        file_p = os.path.join(args.post_analysis_folder, "Run_Record.txt")
-        if os.path.exists(file_p) == False:
-            file1 = open(file_p, "w")
-            L = ["Record of runs starting 25 Jan \n model:{} got ACC:{} on fold {}, image size:{}".format(args.connection_type, Acc, args.fold, args.img_size)]
-            file1.writelines(L)
-            file1.close()
-        else:
-            file1 = open(file_p, "a")  # append mode
-            file1.write("\n model:{} got ACC:{} on fold {}, image size:{}".format(args.connection_type, Acc, args.fold, args.img_size))
-            file1.close()
-    elif args.model_type == 'Segmentation':
-        Acc = my_model.collect_imgs()    
-    
-    
-    
-    
-
-elif args.mode == "collect_imgs":
-    
-    p = "{}_{}_{}_{}_{}_{}.h5".format(args.connection_type, args.fold, args.repeat, args.img_size, args.max_epochs, args.backbone)
-    args.weight_path = os.path.join("WIEGHTS", p)
-    print(args.weight_path)
-    print('data.shape in loader = ', data.shape)
-    
-    AUTOTUNE = tf.data.AUTOTUNE
-    train_data, val_data, test_data = create_folds(args.Num_folds, args.fold, data)
-    print(train_data.shape, val_data.shape, test_data.shape)
-    
-    
-    AUTOTUNE = tf.data.AUTOTUNE
-    
-    train_generator = CustomDataGen(val_data, args, mode = "training")
-    train_generator.pre_check_images()
-    
-    print('Total data len = ', train_generator.n)
-    
-    print('Class Count = ', train_generator.Class_Count())
-    valid_generator = CustomDataGen(test_data, args, mode = "validation")
-    valid_generator.pre_check_images()
-    print('Total val len = ', valid_generator.n)
-    print('Class Count = ', valid_generator.Class_Count())
-    args.batch_size = 1
-    args.weight_path = os.path.join("WIEGHTS", p)
-    my_model = CustomModel(args)
-    my_model.Prep_training(train_generator, valid_generator)
-    print('Class weights = ', my_model.Class_weights)
-    base = "DATASET/All_images"
-    Img_list = os.listdir(base)
-    predict_list = my_model.predict_images_from_Dictory(Img_list, base)
     
 elif args.mode == "attention_maps":
     #tf.compat.v1.disable_eager_execution()
@@ -764,81 +387,6 @@ elif args.mode == "attention_maps":
     index=0
     create_attention_maps = my_model.run_hi_res_cam2(index)       
     
-elif args.mode == "fold_checker":
-    checker = []
-    val_checker = []
-    white = []
-    white2 = []
-    for row in range(0, data.shape[0]):
-        name = data[args.image_col].iloc[row]
-        count = args.Num_folds + 1
-        step = 0
-        for ii in range(0, args.Num_folds):
-            
-            train_data, val_data, test_data = create_folds(args.Num_folds, ii, data)
-            test_list = list(test_data[args.image_col])
-            if name in test_list:
-                count = ii
-            
-        checker.append(count)
-        val_checker.append(step)
-
-    data["fold"] = checker
-    
-    for row in range(0, data.shape[0]):
-        name = str(data[args.image_col].iloc[row])
-        img_path = os.path.join(args.dataset_path_mask, name + args.ext_type_mask)
-        img = cv2.imread(img_path,0)
-        size = img.shape[0] * img.shape[1]
-        POS = np.where(img > 0)
-        scale = round(POS[0].shape[0]/size, 3)
-        white.append(scale)
-    for row in range(0, data.shape[0]):
-        name = str(data[args.image_col].iloc[row])
-        img_path = os.path.join(args.dataset_path_mask.replace("2", "3"), name + args.ext_type_mask)
-        img = cv2.imread(img_path,0)
-        size = img.shape[0] * img.shape[1]
-        POS = np.where(img > 0)
-        scale = round(POS[0].shape[0]/size, 3)
-        white2.append(scale)
-    
-    data["fold"] = checker
-    data["region"] = white
-    
-    data["thresh_region"] = white2
-    data = data[data.fold != args.Num_folds + 1]
-    df = pd.read_excel("Size_information.xlsx")
-    name_list = list(df[args.image_col])
-    score = []
-    for row in range(0, data.shape[0]):
-        name = data[args.image_col].iloc[row]
-        pos = name_list.index(name)
-        score.append(df["Score"].iloc[pos])
-    data["Score"] = score
-    data.to_excel("Size_information2.xlsx")
-if args.mode == "test":
-    strategy = tf.distribute.MirroredStrategy()
-    p = "{}_{}_{}_{}_{}_{}_{}_{}.h5".format(args.connection_type, args.val_fold,args.test_fold, args.repeat, args.img_size, args.max_epochs, args.backbone, args.tag)
-    args.wieghts_output_dir = os.path.join("WIEGHTS", p)
-
-    train_data, val_data, test_data = create_folds(args, data)
-    print(train_data.shape)
-    print(train_data.shape, val_data.shape, test_data.shape)
-    
-    print('data.shape in loader = ', data.shape)
-    
-    #AUTOTUNE = tf.data.AUTOTUNE
-    
-    train_generator = CustomDataGen(train_data, args, mode = "training")
-    print(train_generator.df.shape)
-    train_generator.pre_check_images()
-    Train_data = tf.data.Dataset.from_generator(train_generator, output_types=(tf.float64, tf.int64))
-    train_dist_dataset = strategy.experimental_distribute_dataset(Train_data)
-    count = 0
-    for materials, labels in train_dist_dataset:
-        print(labels)
-        count +=1 
-    print(count)           
 
         
     

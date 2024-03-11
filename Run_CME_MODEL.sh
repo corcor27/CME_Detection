@@ -1,10 +1,4 @@
-#!/bin/bash --login
-#$ -cwd
-#SBATCH --job-name=CME_Detection
-#SBATCH --out=base_model.out.%J
-#SBATCH --err=base_model.err.%J
-#SBATCH -p gpu
-#SBATCH --gres=gpu:1
+#!/bin/bash 
 
 for ret in 0 1 2; do
 	for fod in 0 1 2 3 4; do

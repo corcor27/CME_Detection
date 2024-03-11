@@ -48,11 +48,12 @@ To fix, add into you .bashrc file add the following: alias nano='LD_LIBRARY_PATH
 
 4) changes to make in .sh file:
 
-   #!/bin/bash 
+for ret in 0 1 2; do  #### number of repeat runs
 
-for ret in 0 1 2; do
-	for fod in 0 1 2 3 4; do
-		for model in Resnet121 Densenet121 ; do
+	for fod in 0 1 2 3 4; do #### testing fold
+ 
+		for model in Resnet121 Densenet121 ; do #### model wanted
+
 			python CrossView.py \
 				--backbone $model\
 	        		--repeat $ret\

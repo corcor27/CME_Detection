@@ -67,7 +67,7 @@ To fix, add into you .bashrc file add the following: alias nano='LD_LIBRARY_PATH
 
 5) to run locally run "bash Run_CME_MODEL.sh" and cluster "bash demo.sh"
 
-##Additional Analysis code
+## Additional Analysis code
 
 Wieghts for all models can be found here: https://drive.google.com/file/d/1bw5MUmCKccAPm-KM8-QFrQ2am2gefkcJ/view?usp=drive_link
 
